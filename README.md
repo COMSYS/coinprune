@@ -1,76 +1,55 @@
-Bitcoin Core integration/staging tree
-=====================================
+# CoinPrune - Deployable Block Pruning for Bitcoin
 
-[![Build Status](https://travis-ci.org/bitcoin/bitcoin.svg?branch=master)](https://travis-ci.org/bitcoin/bitcoin)
+> :warning: **Warning:** This is experimental research code for personal investigation. _Do not use in production, you might lose Bitcoins!_ :warning:
 
-https://bitcoincore.org
+Bitcoin was the first successful decentralized cryptocurrency and remains the most popular of its kind to this day.
+Despite the benefits of its blockchain, Bitcoin still faces serious scalability issues, most importantly its ever-increasing blockchain size.
+While alternative designs introduced schemes to periodically create snapshots and thereafter prune older blocks, already-deployed systems such as Bitcoin are often considered incapable of adapting corresponding approaches.
 
-What is Bitcoin?
-----------------
+In our work, we revise this popular belief and present _CoinPrune_, a snapshot-based pruning scheme which is fully compatible to Bitcoin.
+CoinPrune can be deployed through an opt-in velvet fork, i.e., without impeding the established Bitcoin network.
+By requiring miners to publicly _announce_ and jointly _reaffirm_ recent snapshots on the blockchain, CoinPrune establishes trust into the snapshots' correctness even in the presence of powerful adversaries.
+Our evaluation shows that CoinPrune reduces the storage requirements of Bitcoin already by two orders of magnitude today, with further relative savings as the blockchain grows.
+In our experiments, nodes only have to fetch and process 5 GiB instead of 230 GiB of data when joining the network, reducing the synchronization time on powerful devices from currently 5 hours to 46 minutes, with even more savings for less powerful devices.
 
-Bitcoin is an experimental digital currency that enables instant payments to
-anyone, anywhere in the world. Bitcoin uses peer-to-peer technology to operate
-with no central authority: managing transactions and issuing money are carried
-out collectively by the network. Bitcoin Core is the name of open source
-software which enables the use of this currency.
+This repository contains the experimental research code used to implement CoinPrune based on Bitcoin Core v0.17.1.
+All our adaptations to the original Bitcoin Core code are marked using the pre-processor directive `#ifdef COMSYS_COMPACTION` to ease browsability.
 
-For more information, as well as an immediately useable, binary version of
-the Bitcoin Core software, see https://bitcoincore.org/en/download/, or read the
-[original whitepaper](https://bitcoincore.org/bitcoin.pdf).
+The required changes have been implemented by:
+* Benedikt Kalde
+* Arthur Drichel
+* [Roman Matzutt](https://www.roman-matzutt.de)
 
-License
--------
+### Snapshot Availability
 
-Bitcoin Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
-information or see https://opensource.org/licenses/MIT.
+In the near future, we plan to release the snapshots created for our evaluation and to continually update the snapshot repository.
+Stay tuned.
 
-Development Process
--------------------
+### Publication
 
-The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/bitcoin/bitcoin/tags) are created
-regularly to indicate new official, stable release versions of Bitcoin Core.
+*  Roman Matzutt, Benedikt Kalde, Jan Pennekamp, Arthur Drichel, Martin Henze, Klaus Wehrle: How to Securely Prune Bitcoin's Blockchain. In 2020 IFIP Networking Conference (IFIP NETWORKING’20), IFIP, 2020.
 
-The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md).
+### Acknowledgements
 
-Testing
--------
+This work has been funded by the German Federal Ministry of Education and Research (BMBF) under funding reference numbers 16KIS0443, 16DHLQ013, and Z31 BMBF Digital Campus.
+The funding under reference number Z31 BMBF Digital Campus has been provided by the German Academic Exchange Service (DAAD).
+The responsibility for the content of this publication lies with the authors.
 
-Testing and code review is the bottleneck for development; we get more pull
-requests than we can review and test on short notice. Please be patient and help out by testing
-other people's pull requests, and remember this is a security-critical project where any mistake might cost people
-lots of money.
+## Usage
 
-### Automated Testing
+> :warning: **Warning:** This is experimental research code for personal investigation. _Do not use in production, you might lose Bitcoins!_ :warning:
 
-Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
-submit new unit tests for old code. Unit tests can be compiled and run
-(assuming they weren't disabled in configure) with: `make check`. Further details on running
-and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
+### Dependencies
 
-There are also [regression and integration tests](/test), written
-in Python, that are run automatically on the build server.
-These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
+```
+sudo apt-get install pkg-config libboost-all-dev libssl-dev libevent-dev
+```
 
-The Travis CI system makes sure that every pull request is built for Windows, Linux, and macOS, and that unit/sanity tests are run automatically.
+### Compiling
 
-### Manual Quality Assurance (QA) Testing
-
-Changes should be tested by somebody other than the developer who wrote the
-code. This is especially important for large or high-risk changes. It is useful
-to add a test plan to the pull request description if testing the changes is
-not straightforward.
-
-Translations
-------------
-
-Changes to translations as well as new translations can be submitted to
-[Bitcoin Core's Transifex page](https://www.transifex.com/projects/p/bitcoin/).
-
-Translations are periodically pulled from Transifex and merged into the git repository. See the
-[translation process](doc/translation_process.md) for details on how this works.
-
-**Important**: We do not accept translation changes as GitHub pull requests because the next
-pull from Transifex would automatically overwrite them again.
-
-Translators should also subscribe to the [mailing list](https://groups.google.com/forum/#!forum/bitcoin-translators).
+```
+make clean
+./autogen.sh
+./configure --disable-wallet --disable-tests --disable-bench
+make
+```
